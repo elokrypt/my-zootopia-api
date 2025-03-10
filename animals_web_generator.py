@@ -1,29 +1,6 @@
-"""bring animal data into html"""
+"""write animal data into animals.html"""
 
-import requests
-
-global API_KEY
-NINJAS_API_ANIMALS_URL = "https://api.api-ninjas.com/v1/animals?name={}"
-
-
-def get_api_key(file_path: str) -> list:
-    """Retrieve the api-key from file"""
-    with open(file_path, "r") as fd:
-        return fd.readline()
-
-
-def get_animals_from_ninjas(name: str = "Fox") -> [dict, ...]:
-    global API_KEY
-    response = requests.get(NINJAS_API_ANIMALS_URL.format(name), headers={"X-Api-Key": API_KEY})
-    if response.status_code == requests.codes.ok:
-        retval: [] = response.json()
-        if len(retval) > 1:
-            return retval
-        else:
-            retval.insert(0, name)
-            return retval
-    else:
-        raise requests.RequestException(f"Error: [{response.status_code}] {response.text}")
+from data_fetcher import fetch_data
 
 
 def get_html_template(file_path: str) -> str:
@@ -33,9 +10,9 @@ def get_html_template(file_path: str) -> str:
 
 
 def get_animal_cards(animals_list: [dict]):
-    """Briefly prints an animal-dictionary."""
+    """Returns a list of animal-dictionaries in a HTML formatted manner."""
     output: str = str()
-    if isinstance(animals_list[0], dict):
+    if "invalid_name" not in animals_list[0]:
         for animal in animals_list:
             output += '<li class="cards__item">\n'
             if "name" in animal:
@@ -53,16 +30,15 @@ def get_animal_cards(animals_list: [dict]):
                 output += f"<li><strong>Type:</strong> {animal['characteristics']['type']}</li>\n"
             output += "</ul>\n</p>\n</li>\n"
     else:
-        output += f'<h2>Sorry, the animal <span style="color:red;">{animals_list[0]}</span> doesn\'t exist.</h2>'
+        output += (
+            f'<h2>Sorry, the animal <span style="color:red;">{animals_list[0]["invalid_name"]}</span> doesn\'t exist.</h2>'
+        )
     return output
 
 
 def main():
-    global API_KEY
-    API_KEY = get_api_key("api-ninjas.txt")
-
     animal_name = input("Enter an animal's name: ")
-    animals = get_animals_from_ninjas(animal_name)
+    animals = fetch_data(animal_name)
     template = get_html_template("animals_template.html")
     animals_info = get_animal_cards(animals)
 
