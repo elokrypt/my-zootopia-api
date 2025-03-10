@@ -53,7 +53,8 @@ def main():
     global API_KEY
     API_KEY = get_api_key("api-ninjas.txt")
 
-    animals = get_animals_from_ninjas()
+    animal_name = input("Enter an animal's name: ")
+    animals = get_animals_from_ninjas(animal_name)
     template = get_html_template("animals_template.html")
     animals_info = get_animal_cards(animals)
 
