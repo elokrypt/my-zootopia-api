@@ -16,7 +16,12 @@ def get_animals_from_ninjas(name: str = "Fox") -> [dict, ...]:
     global API_KEY
     response = requests.get(NINJAS_API_ANIMALS_URL.format(name), headers={"X-Api-Key": API_KEY})
     if response.status_code == requests.codes.ok:
-        return response.json()
+        retval: [] = response.json()
+        if len(retval) > 1:
+            return retval
+        else:
+            retval.insert(0, name)
+            return retval
     else:
         raise requests.RequestException(f"Error: [{response.status_code}] {response.text}")
 
@@ -30,22 +35,25 @@ def get_html_template(file_path: str) -> str:
 def get_animal_cards(animals_list: [dict]):
     """Briefly prints an animal-dictionary."""
     output: str = str()
-    for animal in animals_list:
-        output += '<li class="cards__item">\n'
-        if "name" in animal:
-            output += f'<div class="card__title">{animal["name"]}</div>\n'
-        output += '<p class="card__text"><ul>'
-        if "scientific_name" in animal["taxonomy"]:
-            output += f"<li><strong>Scientific Name:</strong> {animal['taxonomy']['scientific_name']}</li>\n"
-        if "lifespan" in animal["characteristics"]:
-            output += f"<li><strong>Lifespan:</strong> {animal['characteristics']['lifespan']}</li>\n"
-        if "diet" in animal["characteristics"]:
-            output += f"<li><strong>Diet:</strong> {animal['characteristics']['diet']}</li>\n"
-        if "locations" in animal:
-            output += f"<li><strong>Location:</strong> {animal['locations'][0]}</li>\n"
-        if "type" in animal["characteristics"]:
-            output += f"<li><strong>Type:</strong> {animal['characteristics']['type']}</li>\n"
-        output += "</ul>\n</p>\n</li>\n"
+    if isinstance(animals_list[0], dict):
+        for animal in animals_list:
+            output += '<li class="cards__item">\n'
+            if "name" in animal:
+                output += f'<div class="card__title">{animal["name"]}</div>\n'
+            output += '<p class="card__text"><ul>'
+            if "scientific_name" in animal["taxonomy"]:
+                output += f"<li><strong>Scientific Name:</strong> {animal['taxonomy']['scientific_name']}</li>\n"
+            if "lifespan" in animal["characteristics"]:
+                output += f"<li><strong>Lifespan:</strong> {animal['characteristics']['lifespan']}</li>\n"
+            if "diet" in animal["characteristics"]:
+                output += f"<li><strong>Diet:</strong> {animal['characteristics']['diet']}</li>\n"
+            if "locations" in animal:
+                output += f"<li><strong>Location:</strong> {animal['locations'][0]}</li>\n"
+            if "type" in animal["characteristics"]:
+                output += f"<li><strong>Type:</strong> {animal['characteristics']['type']}</li>\n"
+            output += "</ul>\n</p>\n</li>\n"
+    else:
+        output += f'<h2>Sorry, the animal <span style="color:red;">{animals_list[0]}</span> doesn\'t exist.</h2>'
     return output
 
 
