@@ -2,6 +2,9 @@
 
 import requests
 
+from dotenv import load_dotenv
+from os import getenv
+
 global API_KEY
 NINJAS_API_ANIMALS_URL = "https://api.api-ninjas.com/v1/animals?name={}"
 
@@ -11,8 +14,8 @@ def require_api_key(func):
 
     def wrap(*args, **kwargs):
         global API_KEY
-        with open("api-ninjas.txt", "r") as fd:
-            API_KEY = fd.readline()
+        load_dotenv()
+        API_KEY = getenv("API_KEY")
         return func(*args, **kwargs)
 
     return wrap
