@@ -10,4 +10,4 @@ the dependencies in requirements.txt using `pip install -r requirements.txt`
 
 ## Usage
 
-To generate "animals.html", run the following command - `python animals_web_generator.py`.
+To generate "html/animals.html", run the following command - `python animals_web_generator.py`.
